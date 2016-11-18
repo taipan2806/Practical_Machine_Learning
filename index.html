@@ -137,7 +137,7 @@ $(document).ready(function () {
 </div>
 <div id="data-preprocessing" class="section level2">
 <h2>4. Data Preprocessing</h2>
-<p>Data is downloaded from <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a> and <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a> and stored in directory data for all later use.</p>
+<p>Data is downloaded from <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a> and <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a> and stored in for all later use.</p>
 <div id="preparation-and-data-import" class="section level3">
 <h3>4.1 Preparation and Data Import</h3>
 <pre class="r"><code># Set seed
@@ -146,13 +146,13 @@ set.seed(2806)
 # Load required packages
 library(plyr); library(gbm); library(survival); library(caret); library(randomForest);
 
-# Read csv and mark NA, #Div/0! and empty values as NA
+# Read csv and transform NA, #Div/0! and empty values as NA
 rawTrainData &lt;- read.csv(&quot;pml-training.csv&quot;, na.strings = c(&quot;NA&quot;, &quot;#DIV/0!&quot;, &quot;&quot;))
 rawTestData &lt;- read.csv(&quot;pml-testing.csv&quot;, na.strings = c(&quot;NA&quot;, &quot;#DIV/0!&quot;, &quot;&quot;))</code></pre>
 </div>
 <div id="data-cleaning" class="section level3">
 <h3>4.2 Data Cleaning</h3>
-<p>All columns containing NAs or NearZero values are removed. Further, first 7 columns contain no useful information or even VERFÄLSCHEN prediction outcome (column X). Therfore, they are removed from data set.</p>
+<p>All columns containing only NAs or NearZero values are removed. Further, first 7 columns contain no useful information or even falsify prediction outcome (column X). Therfore, they are removed from data set.</p>
 <pre class="r"><code># Remove all NAs and nearZero values
 processedTrainData &lt;- rawTrainData[, colSums(is.na(rawTrainData)) == 0]
 nzv &lt;- nearZeroVar(processedTrainData)
@@ -171,7 +171,7 @@ dim(processedTrainData)</code></pre>
 </div>
 <div id="data-splitting" class="section level3">
 <h3>4.3 Data Splitting</h3>
-<p>To get out-of-sample error, training set has to be splitted into a training set (70%) and a train set (30%).</p>
+<p>Training set is splitted into a training set (70%) and a train set (30%).</p>
 <pre class="r"><code>subSetTrain &lt;- createDataPartition(processedTrainData$classe, p = 0.7, list = FALSE)
 subTrain &lt;- processedTrainData[subSetTrain, -c(1:7)]
 subTest &lt;- processedTrainData[-subSetTrain, -c(1:7)] </code></pre>
@@ -179,7 +179,7 @@ subTest &lt;- processedTrainData[-subSetTrain, -c(1:7)] </code></pre>
 </div>
 <div id="model-evaluation" class="section level2">
 <h2>5. Model Evaluation</h2>
-<p>Random Forest and Generalized Boosted Model can be considered as models with high accuracies. In this section accuracy and processing durations are performed and compared.</p>
+<p>In this section, accuracy and processing durations of RF and GBM are performed and compared.</p>
 <div id="random-forest" class="section level3">
 <h3>5.1 Random Forest</h3>
 <pre class="r"><code># Train model
@@ -216,7 +216,7 @@ trainRF$finalModel</code></pre>
 ## C    0   14 2375    7    0 0.008764608
 ## D    0    1   20 2227    4 0.011101243
 ## E    0    0    3    7 2515 0.003960396</code></pre>
-<p>Random Forest achieved accuracy of 99.3543% in 1549 seconds with an out of sample error of 0.65%.</p>
+<p>Random Forest achieved accuracy of 99.3543% in 1535 seconds with an out of sample error of 0.65%.</p>
 </div>
 <div id="generalized-boosted-model" class="section level3">
 <h3>5.2 Generalized Boosted Model</h3>
@@ -242,16 +242,16 @@ trainGBM$finalModel</code></pre>
 <pre><code>## A gradient boosted model with multinomial loss function.
 ## 150 iterations were performed.
 ## There were 51 predictors of which 42 had non-zero influence.</code></pre>
-<p>Generalized Boosted Model achieved accuracy of 95.599% in 694 seconds with an out of sample error of 4.4%.</p>
+<p>Generalized Boosted Model achieved accuracy of 95.599% in 718 seconds with an out of sample error of 4.4%.</p>
 </div>
 <div id="comparison" class="section level3">
 <h3>5.3 Comparison</h3>
-<p>Random Forest performed with higher accuracy (RF: 99.3543%, GBM: 95.599%). Processing times differ significant (RF: 1549s, GBM: 694s). Out of sample error (RF: 0.65%, GBM: 4.4%)</p>
+<p>Random Forest performed with higher accuracy (RF: 99.3543%, GBM: 95.599%). Processing times differ significant (RF: 1535s, GBM: 718s). Out of sample error (RF: 0.65%, GBM: 4.4%)</p>
 </div>
 </div>
 <div id="applying-final-model" class="section level2">
 <h2>6. Applying Final Model</h2>
-<p>Random Forest achieved better accuracy (3.75%). Therefore it will be used to predict the requested 20 test cases.</p>
+<p>Random Forest achieved better accuracy (+3.75%). Therefore, it will be used to predict the requested 20 test cases.</p>
 <div id="applying-random-forest" class="section level3">
 <h3>6.1 Applying Random Forest</h3>
 <pre class="r"><code># Apply model
@@ -282,15 +282,15 @@ applyRFTest</code></pre>
 </div>
 <div id="out-of-sample-error" class="section level3">
 <h3>7.2 Out of sample error</h3>
-<p>Out of sample error is: 0.65%.</p>
+<p>Out of sample error is 0.65%.</p>
 </div>
 <div id="cross-validation" class="section level3">
 <h3>7.3 Cross validation</h3>
-<p>10-fold cross validation was used.</p>
+<p>10-fold cross validation was applied</p>
 </div>
 <div id="processing-durations" class="section level3">
 <h3>7.4 Processing durations</h3>
-<p>Processing durations differ significantly. Due to its shorter processing duration, use of GBM could be considered as fast alternative of RF.</p>
+<p>Processing durations differ significantly. Due to its shorter processing duration and its high accuracy, GBM could be considered as fast alternative to RF.</p>
 </div>
 </div>
 
