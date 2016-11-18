@@ -1,0 +1,157 @@
+---
+title: 'Assignment: Prediction Assignment Writeup'
+author: "taipan2806"
+date: "November 7, 2016"
+output: html_document
+---
+
+##1. Goal
+The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases.  
+
+##2. Background
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <http://groupware.les.inf.puc-rio.br/har> (see the section on the Weight Lifting Exercise Dataset).  
+
+##3. Approach
+Random Forest (RF) and Generalized Boosted Model (GBM) can be considered as models with high accuracies. To predict the requested 20 test cases accuracies of both models are compared. The model with better accuracy will be applied to predict the test cases. Additionally, duration of their processings are also measured. However, they are just for information.  
+
+##4. Data Preprocessing
+Data is downloaded from <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv> and <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv> and stored in directory data for all later use.
+
+###4.1 Preparation and Data Import
+```{r include=FALSE}
+# This intends to hide packages' loading messages and working directory.
+# Load required packages
+library(plyr); library(gbm); library(survival); library(caret); library(randomForest);
+
+# Set working directory
+setwd("/home/patrick/Documents/Coursera/Data Science Specialization/00_WorkingDirectory/")
+```
+```{r}
+# Set seed
+set.seed(2806)
+
+# Load required packages
+library(plyr); library(gbm); library(survival); library(caret); library(randomForest);
+
+# Read csv and mark NA, #Div/0! and empty values as NA
+rawTrainData <- read.csv("pml-training.csv", na.strings = c("NA", "#DIV/0!", ""))
+rawTestData <- read.csv("pml-testing.csv", na.strings = c("NA", "#DIV/0!", ""))
+
+```
+###4.2 Data Cleaning
+All columns containing NAs or NearZero values are removed. Further, first 7 columns contain no useful information or even VERFÄLSCHEN prediction outcome (column X). Therfore, they are removed from data set.    
+
+```{r}
+# Remove all NAs and nearZero values
+processedTrainData <- rawTrainData[, colSums(is.na(rawTrainData)) == 0]
+nzv <- nearZeroVar(processedTrainData)
+processedTrainData <- processedTrainData[, -nzv]
+
+processedTestData <- rawTestData[, colSums(is.na(rawTestData)) == 0]
+nzv <- nearZeroVar(processedTestData)
+processedTestData <- processedTestData[, -nzv]
+
+# Show dimension
+dim(processedTrainData)
+dim(processedTestData)
+```  
+Both training and test set consist now of same number of variables: 59.
+
+###4.3 Data Splitting
+To get out-of-sample error, training set has to be splitted into a training set (70%) and a train set (30%).
+
+```{r}
+subSetTrain <- createDataPartition(processedTrainData$classe, p = 0.7, list = FALSE)
+subTrain <- processedTrainData[subSetTrain, -c(1:7)]
+subTest <- processedTrainData[-subSetTrain, -c(1:7)] 
+```  
+##5. Model Evaluation
+Random Forest and Generalized Boosted Model can be considered as models with high accuracies. In this section accuracy and processing durations are performed and compared. 
+
+###5.1 Random Forest  
+```{r eval = TRUE}
+# Train model
+timerRFStart <- Sys.time()
+controlRF <- trainControl(method = "cv", number = 10, verboseIter = FALSE, allowParallel = TRUE)
+trainRF <- train(classe ~ ., data = subTrain, method = "rf", trControl = controlRF)
+
+# Predict test set
+applyRF <- predict(trainRF, subTest)
+
+# Evaluate performance
+matrixRF <- confusionMatrix(subTest$classe, applyRF)
+accuracyRF <- matrixRF$overall['Accuracy']
+timerRFStop <- Sys.time()
+costRF <- as.numeric(timerRFStop - timerRFStart, units = "secs")
+
+# Out of sample error
+errorRF <- sum(subTest$classe != applyRF) / length(applyRF) * 100
+
+# Show results
+trainRF$finalModel
+
+```  
+Random Forest achieved accuracy of `r round(accuracyRF *100, 4)`% in `r ceiling(costRF)` seconds with an out of sample error of `r round(errorRF, 2)`%.     
+
+###5.2 Generalized Boosted Model
+```{r eval = TRUE}
+# Train model
+timerGBMStart <- Sys.time()
+controlGBM <- trainControl(method = "cv", number = 10, verboseIter = FALSE, allowParallel = TRUE)
+trainGBM <- train(classe ~ ., data = subTrain, method = "gbm", trControl = controlGBM, verbose = FALSE)
+
+# Predict test set
+applyGBM <- predict(trainGBM, subTest)
+
+#Evaluate performance
+matrixGBM <- confusionMatrix(subTest$classe, applyGBM)
+accuracyGBM <- matrixGBM$overall['Accuracy']
+timerGBMStop <- Sys.time()
+costGBM <- as.numeric(timerGBMStop - timerGBMStart, units = "secs")
+
+# Out of sample error
+errorGBM <- sum(subTest$classe != applyGBM) / length(applyGBM) * 100
+
+# Show results
+trainGBM$finalModel
+```  
+Generalized Boosted Model achieved accuracy of `r round(accuracyGBM *100, 4)`% in `r ceiling(costGBM)` seconds with an out of sample error of `r round(errorGBM, 2)`%.       
+
+###5.3 Comparison
+Random Forest performed with higher accuracy (RF: `r round(accuracyRF *100, 4)`%, GBM: `r round(accuracyGBM *100, 4)`%). Processing times differ significant (RF: `r ceiling(costRF)`s, GBM: `r ceiling(costGBM)`s).
+Out of sample error (RF: `r round(errorRF, 2)`%, GBM: `r round(errorGBM, 2)`%)
+
+##6. Applying Final Model
+Random Forest achieved better accuracy (`r round(accuracyRF *100, 2) - round(accuracyGBM *100, 2)`%). Therefore it will be used to predict the requested 20 test cases.  
+
+###6.1 Applying Random Forest  
+```{r eval = TRUE}
+# Apply model
+timerTestStart <- Sys.time()
+applyRFTest <- predict(trainRF, processedTestData)
+
+# Evaluate performance
+timerTestStop <- Sys.time()
+costRF <- as.numeric(timerTestStop - timerTestStart, units = "secs")
+```  
+###6.2 Predictions
+Predictions for test cases are:  
+```{r}
+# Show predictions
+applyRFTest
+```
+##7. Conclusion
+
+###7.1 Predictions
+Predictions for test set are:  
+```{r}
+applyRFTest
+```  
+###7.2 Out of sample error  
+Out of sample error is:  `r round(errorRF, 2)`%.  
+
+###7.3 Cross validation  
+10-fold cross validation was used.  
+
+###7.4 Processing durations  
+Processing durations differ significantly. Due to its shorter processing duration, use of GBM could be considered as fast alternative of RF.    
