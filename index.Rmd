@@ -15,7 +15,7 @@ Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible t
 Random Forest (RF) and Generalized Boosted Model (GBM) can be considered as models with high accuracies. To predict the requested 20 test cases accuracies of both models are compared. The model with better accuracy will be applied to predict the test cases. Additionally, duration of their processings are also measured. However, they are just for information.  
 
 ##4. Data Preprocessing
-Data is downloaded from <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv> and <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv> and stored in for all later use.
+Data is downloaded from <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv> and <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv> and stored for later use.
 
 ###4.1 Preparation and Data Import
 ```{r include=FALSE}
@@ -154,4 +154,4 @@ Out of sample error is `r round(errorRF, 2)`%.
 10-fold cross validation was applied  
 
 ###7.4 Processing durations  
-Processing durations differ significantly. Due to its shorter processing duration and its high accuracy, GBM could be considered as fast alternative to RF.    
+Processing durations differ significantly. Due to its shorter processing duration and its high accuracy GBM could be considered as fast alternative to RF.    

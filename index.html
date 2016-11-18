@@ -137,7 +137,7 @@ $(document).ready(function () {
 </div>
 <div id="data-preprocessing" class="section level2">
 <h2>4. Data Preprocessing</h2>
-<p>Data is downloaded from <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a> and <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a> and stored in for all later use.</p>
+<p>Data is downloaded from <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a> and <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a> and stored for later use.</p>
 <div id="preparation-and-data-import" class="section level3">
 <h3>4.1 Preparation and Data Import</h3>
 <pre class="r"><code># Set seed
@@ -216,7 +216,7 @@ trainRF$finalModel</code></pre>
 ## C    0   14 2375    7    0 0.008764608
 ## D    0    1   20 2227    4 0.011101243
 ## E    0    0    3    7 2515 0.003960396</code></pre>
-<p>Random Forest achieved accuracy of 99.3543% in 1535 seconds with an out of sample error of 0.65%.</p>
+<p>Random Forest achieved accuracy of 99.3543% in 1447 seconds with an out of sample error of 0.65%.</p>
 </div>
 <div id="generalized-boosted-model" class="section level3">
 <h3>5.2 Generalized Boosted Model</h3>
@@ -242,11 +242,11 @@ trainGBM$finalModel</code></pre>
 <pre><code>## A gradient boosted model with multinomial loss function.
 ## 150 iterations were performed.
 ## There were 51 predictors of which 42 had non-zero influence.</code></pre>
-<p>Generalized Boosted Model achieved accuracy of 95.599% in 718 seconds with an out of sample error of 4.4%.</p>
+<p>Generalized Boosted Model achieved accuracy of 95.599% in 667 seconds with an out of sample error of 4.4%.</p>
 </div>
 <div id="comparison" class="section level3">
 <h3>5.3 Comparison</h3>
-<p>Random Forest performed with higher accuracy (RF: 99.3543%, GBM: 95.599%). Processing times differ significant (RF: 1535s, GBM: 718s). Out of sample error (RF: 0.65%, GBM: 4.4%)</p>
+<p>Random Forest performed with higher accuracy (RF: 99.3543%, GBM: 95.599%). Processing times differ significant (RF: 1447s, GBM: 667s). Out of sample error (RF: 0.65%, GBM: 4.4%)</p>
 </div>
 </div>
 <div id="applying-final-model" class="section level2">
@@ -290,7 +290,7 @@ applyRFTest</code></pre>
 </div>
 <div id="processing-durations" class="section level3">
 <h3>7.4 Processing durations</h3>
-<p>Processing durations differ significantly. Due to its shorter processing duration and its high accuracy, GBM could be considered as fast alternative to RF.</p>
+<p>Processing durations differ significantly. Due to its shorter processing duration and its high accuracy GBM could be considered as fast alternative to RF.</p>
 </div>
 </div>
 
